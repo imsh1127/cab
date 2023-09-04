@@ -1,0 +1,816 @@
+#include <stdio.h>
+
+int main() {
+   int m,n,cnt=0; scanf("%d %d",&m,&n);//최솟값, 최댓값, 카운터
+int i=m,tcnt=2;//m부터 시작해서 n까지 갈 것임. // 2부터 차례대로 i를 나눌 것임.
+  if (m==2) printf("2\n");
+
+  for (i=m;i<=n;i++)
+    {
+      cnt=0;
+      for (tcnt=2;tcnt*tcnt <= i;tcnt++)
+      {
+          if ((tcnt==2)||(tcnt%2!=0))
+        {
+          if (i%tcnt==0)
+          {
+            cnt++;
+            break;
+          }
+          //2부터 i의 절반까지의 홀수 중 하나로 나눠지면 cnt 올림.
+        } 
+      }
+      if((i!=1)&&(i!=2)&&(cnt==0)) printf("%d\n",i);
+      //cnt가 0이라는 건 소수라는 뜻! 
+   }
+    
+}
+
+
+
+
+
+
+
+
+5
+3 4 		00 01
+1 1		10 11
+1 -1		20 21
+2 2		30 31
+3 3		40 41
+//xy좌표 교환
+#include <stdio.h>
+
+int main() {
+  int n; scanf("%d",&n);
+int locx[n],locy[n];
+  int loc[n][2];
+  for (int i=0; i<n; i++)
+    {
+      scanf("%d %d",&locx[i],&locy[i]);
+      loc[i][0]=locx[i];
+      loc[i][1]=locy[i];
+    }//배열 loc에는 각 좌표가 저장됨.
+  
+for (int h=0;h<n-1;h++)
+  { 
+    int tmpx=0, tmpy=0;
+    for (int i=0;i<n-1;i++)
+      {
+        if (loc[i][0]>loc[i+1][0])
+        {
+         tmpx=loc[i][0];
+         loc[i][0]=loc[i+1][0];
+         loc[i+1][0]=tmpx;
+          
+          tmpy=loc[i][1];
+         loc[i][1]=loc[i+1][1];
+         loc[i+1][1]=tmpy;
+        } //x좌표끼리 교환, 짝지어진 y좌표도 해당하는 위치로 이동
+        
+        if (loc[i][0]==loc[i+1][0])
+          {//x좌표가 같으면
+            if(loc[i][1]>loc[i+1][1])
+            {//y좌표를 비교
+          tmpy=loc[i][1];
+         loc[i][1]=loc[i+1][1];
+         loc[i+1][1]=tmpy;
+            }
+        }
+      }
+  }
+  
+  for (int i=0;i<n;i++)
+    {
+      for(int j=0;j<2;j++) 
+      {
+        printf("%d ",loc[i][j]);
+      }
+      puts("");
+    }
+ }
+
+
+
+//문자열 사전식 정렬하기
+#include <stdio.h>
+#include <string.h>//strlen, strcmp
+#include <stdlib.h>//sizeof
+
+int compare(const void* a, const void* b)
+{    //qsort 안 함수
+	char *w1 = (char*)a;//배열1
+	char *w2 = (char*)b;//배열2
+	int n1 = strlen(w1);
+	int n2 = strlen(w2);
+	if (n1 < n2) return -1;	//문자열 길이 비교
+	else if (n1 > n2) return 1;
+	else return strcmp(w1, w2);//길이가 같으면 문자열 원소 비교 함수로 사전식 정렬
+}
+
+char text[20000][51];
+int N;
+
+int main()
+{
+	scanf("%d", &N);
+	for (int i = 0; i < N; i++) scanf("%s", text[i]);
+  
+	qsort(text, N, sizeof(text[0]), compare);
+    //compare의 반환값이 -1이면 정렬X, 1이면 오름차순 정렬,
+    //0이면 문자열의 길이로는 비교하지 않고 배열의 원소끼리 비교해서 정렬. 
+  
+	for (int i = 0; i < N; i++)
+  {
+		if (strcmp(text[i], text[i + 1]) != 0 || i==N-1) printf("%s\n", text[i]);	//문자가 다를 경우에만 출력
+		
+	}
+	return 0;
+}
+
+
+
+
+//구조체 사용해보기
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>//c++에서만 되므로 주의!
+
+typedef struct info{
+int age;
+char name[101];
+}info;
+
+int compare(const void* a, const void* b)
+{    //qsort 안 함수
+	info *w1 = (info*)a;//배열1
+	info *w2 = (info*)b;//배열2
+	if (w1->age <= w2->age) return -1;	//크기 비교
+	else return 1;
+}
+
+int main()
+{
+int N; scanf("%d", &N);
+  int age;
+  char name[101];
+info data[N];
+  
+  for (int i = 0; i < N; i++)
+    {
+      scanf("%d %s", &age, name);
+  data[i].age=age;
+      strcpy(data[i].name,name);//문자열은 받을 때 strcpy함수 사용. 바로 대입하면 안됨.
+      }
+qsort(data, N, sizeof(data[0]), compare);
+  //배열 이름, 원소의 수, 원소 '하나'의 크기, compare 함수
+for(int i=0;i<N;i++)
+		printf("%d %s\n",data[i].age,data[i].name);
+
+  
+	return 0;
+  }
+
+
+
+
+
+//합병정렬
+# include <stdio.h>
+# define MAX_SIZE 8
+int sorted[MAX_SIZE]; // 추가적인 공간이 필요
+
+// i: 정렬된 왼쪽 리스트에 대한 인덱스
+// j: 정렬된 오른쪽 리스트에 대한 인덱스
+// k: 정렬될 리스트에 대한 인덱스
+/* 2개의 인접한 배열 list[left...mid]와 list[mid+1...right]의 합병 과정 */
+/* (실제로 숫자들이 정렬되는 과정) */
+void merge(int list[], int left, int mid, int right){
+  int i, j, k, l;
+  i = left;
+  j = mid+1;
+  k = left;
+
+  /* 분할 정렬된 list의 합병 */
+  while(i<=mid && j<=right){
+    if(list[i]<=list[j])
+      sorted[k++] = list[i++];
+    else
+      sorted[k++] = list[j++];
+  }
+
+  // 남아 있는 값들을 일괄 복사
+  if(i>mid){//i가 mid보다 커짐, 즉 i== mid+1이면 왼쪽 배열은 모두 정렬배열로 복사됐다는 뜻임.
+    for(l=j; l<=right; l++)
+      sorted[k++] = list[l];
+  }
+  // 남아 있는 값들을 일괄 복사
+  else{//이건 오른쪽 배열만 모두 복사됐다는 뜻.
+    for(l=i; l<=mid; l++)
+      sorted[k++] = list[l];
+  }
+
+  // 배열 sorted[](임시 배열)의 리스트를 배열 list[]로 재복사
+  for(l=left; l<=right; l++){
+    list[l] = sorted[l];
+  }
+}
+
+// 합병 정렬
+void merge_sort(int list[], int left, int right){
+  int mid;
+
+  if(left<right){
+    mid = (left+right)/2; // 중간 위치를 계산하여 리스트를 균등 분할 -분할(Divide)
+    merge_sort(list, left, mid); // 앞쪽 부분 리스트 정렬 -정복(Conquer)
+    merge_sort(list, mid+1, right); // 뒤쪽 부분 리스트 정렬 -정복(Conquer)
+    merge(list, left, mid, right); // 정렬된 2개의 부분 배열을 합병하는 과정 -결합(Combine)
+  }
+}
+
+int main(){
+  int i;
+  int n = MAX_SIZE;
+  int list[8] = {21, 10, 12, 20, 25, 13, 15, 22};
+
+  // 합병 정렬 수행(left: 배열의 시작 = 0, right: 배열의 끝 = 7)
+  merge_sort(list, 0, n-1);
+
+  // 정렬 결과 출력
+  for(i=0; i<n; i++){
+    printf("%d\n", list[i]);
+  }
+}
+
+
+//브루트포스-블랙잭
+#include<stdio.h>
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdlib.h>//qsort함수
+int static compare(const void* first, const void* second);
+
+int main()
+{
+	int n = 0, m = 0; // 카드 개수, 기준 숫자
+	scanf_s("%d %d", &n, &m);
+
+	int card[101];
+
+	for (int i = 0; i < n; i++)
+	{
+		scanf_s("%d", &card[i]);
+	}//카드 수 받기
+
+	int max = 0, tmp = 0; // 카드 셋의 합 중의 최댓값, 임시변수
+
+	qsort(card, n, sizeof(int), compare); //카드값을 오름차순으로 정렬.
+
+	for (int i = 0; i < n - 2; i++) {
+		for (int j = i+1; j < n - 1; j++) {
+			for (int k = j+1; k < n; k++) {
+				tmp = card[i] + card[j] + card[k];
+				if ((max < tmp) && (tmp <= m))//3개의 수의 합 중 가장 큰 것, 그중에서도 m을 넘지 않는 값을 저장함..
+					max = tmp;
+			}
+		}
+	}
+	printf("%d", max);
+
+}
+int static compare(const void* first, const void* second)
+{
+	if (*(int*)first > *(int*)second)
+		return 1;
+	else if (*(int*)first < *(int*)second)
+		return -1;
+	else
+		return 0;
+}
+
+//있는지 없는지 확인하는 bsearch함수
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+
+#define MAX 500001
+
+int n, m, x;
+int a[MAX];
+
+int compare (const void * a, const void * b)
+{
+    return ( *(int*)a - *(int*)b );
+} //퀵정렬용 컴페어 함수
+
+int main()
+{
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%d", &a[i]);
+    } //상근이 카드 목록
+    qsort(a, n, sizeof(int), compare); //퀵솔트
+
+    scanf("%d", &m); //비교할 카드 개수
+    while (m--) //m이 0될때까지 총 m번 반복
+    {
+        scanf("%d", &x);
+        int *result = (int*)bsearch(&x, a, n, sizeof(int), compare);
+//bsearch함수: 입력한 숫자, a배열이름, a배열의 크기, 원소의 크기, 컴페어함수 입력. 입력한 숫자가 a배열에 있는지 비교함.
+        if (result == NULL)
+            printf("0 ");
+        else
+            printf("1 ");
+    }
+    return 0;
+}
+
+//문자열 배열을 사전 정렬 후, 문자열이 있는지 찾아보기
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#define MAX_LEN 505
+
+int n, m;
+char set[10010][MAX_LEN];//내 문자열
+
+int compare(const void *a, const void *b) {
+  return strcmp((char *)a, (char *)b);
+}
+
+int search(char *target) {
+  int left = 0;
+  int right = n - 1;
+  int mid;
+
+  while (left <= right) {//문자열 비교
+    mid = (left + right) / 2;
+    int cmp = strcmp(set[mid], target);
+    if (cmp == 0) {
+      return 1;
+    } else if (cmp < 0) {//이전 원소가 더 우선이면
+      left = mid + 1;//그 후의 set 원소를 찾아봄.
+    } else {//이후 원소가 더 우선이면
+      right = mid - 1;//그 전의 set 원소를 찾아봄.
+    }
+  }//★ 이분법 정렬
+
+  return 0;
+}
+
+int main() {
+  scanf("%d %d", &n, &m);
+
+  for (int i = 0; i < n; i++) {
+    scanf("%s", set[i]);
+  }
+
+  qsort(set, n, sizeof(char) * MAX_LEN, compare);//사전식 정렬
+
+  int count = 0;
+  char target[MAX_LEN];//대상 문자열
+  for (int i = 0; i < m; i++) {
+    scanf("%s", target);
+    if (search(target)) {
+      count++;//
+    }
+  }
+
+  printf("%d\n", count);
+
+  return 0;
+}
+
+
+
+
+//A와 B의 원소들 중, 중복되는 원소를 모두 뺀 나머지 원소의 개수를 출력함.
+
+#include <stdio.h>
+#include <search.h>
+#include <stdlib.h>
+int compare(const void *a, const void* b){
+    return (int) *((int *) a) - (int) *((int *) b);
+}//리턴값 해설: (int*)로 void포인터를 int포인터로 변환 후, *를 앞에 붙여 원소가 가리키는 값 자체를 지칭하여,(int)로 그 값을 정수로 변환한다. 
+
+int main(){
+int a,b,x;
+scanf("%d%d",&a,&b);
+
+int num[a+b+1], cnt=a+b;//a집합과 b집합의 통합배열, 대칭차집합의 원소의 개수. 우리는 기본 a+b개에서 2개씩 뺄 것임.
+
+for (int i=0;i<a;i++)
+scanf("%d",&num[i]); //a배열을 일단 다 받는다.
+
+qsort(num, a, sizeof(num[0]), compare);  
+  
+for (int i=0;i<b;i++)
+{
+  int tmp=x; //중복체크용 원소. 처음엔 쓰레기값 이후 입력 전 x값을 대입함.
+scanf("%d",&x); //b배열의 원소를 받는데,
+  
+int* result= (int*) bsearch(&x, num, a, sizeof(num[0]), compare);//bsearch는 여기서, &x를 num배열에서 찾았을 경우 그 원소가 있는 해당 주소값을 반환한다.
+  
+if ((result!=NULL)&&(tmp!=x)) cnt-=2; //만약 입력된 숫자가 a배열에도 있는 숫자라면 cnt를 a배열에서 하나, b배열에서 하나씩 총 2개 뺌. 만약 (tmp==x)라면 이전에 이미 했던 수이므로 1개만 제외.
+  else if ((result!=NULL)&&(tmp==x)) cnt-=1;
+}
+  
+printf("%d",cnt);
+
+  return 0;
+}
+
+
+//최소공배수 구하기
+#include <stdio.h>
+
+int gcd(int a, int b){
+if (b==0) return a;
+else return gcd(b, a%b);
+}//최대공약수 구하는 함수
+
+int main() {
+   int t,a,b; scanf("%d",&t);
+  int ary[t];
+  for (int i=0;i<t;i++)
+  {
+  scanf("%d %d",&a,&b);  
+  ary[i]=(a*b)/gcd(a,b);
+  //두 수의 곱을 최대공약수로 나누면 최소공배수.
+}
+  for (int i=0;i<t;i++)
+  {
+    printf("%d\n",ary[i]);
+  }
+
+  }//유클리드 알고리즘
+2개의 자연수  a, b에 대해서 a를 b로 나눈 나머지를 r이라 하면 (단 a>b),
+a와 b의 최대공약수는 b와 r의 최대공약수와 같다.
+이 성질에 따라, b를 r로 나눈 나머지 r0를 구하고,
+다시 r을 r0로 나눈 나머지를 구하는 과정을 반복하여 나머지가 0이 되었을 때 나누는 수가 a와 b의 최대공약수이다. 
+
+  
+
+//
+이 문제는 나머지 연산의 성질을 이용하여 풀 수 있습니다.
+
+N개의 수를 M으로 나누었을 때 나머지가 같다는 것은, 모든 수를 M으로 나눈 나머지가 같다는 것입니다. 이를 식으로 나타내면 다음과 같습니다.
+
+a[1] % M = a[2] % M = ... = a[N] % M
+
+양변에 a[1]을 더하고 빼면 다음과 같은 식을 얻을 수 있습니다.
+
+a[1] - a[2] ≡ 0 (mod M)
+a[1] - a[3] ≡ 0 (mod M)
+...
+a[1] - a[N] ≡ 0 (mod M)
+
+즉, 각 수를 첫 번째 수로부터 뺀 값의 절대값들의 최대공약수가 가능한 M의 값이 됩니다. 이를 모든 수에 대해 구한 뒤, 중복을 제거하여 출력하면 됩니다.
+
+#include <iostream>
+#include <algorithm>
+ 
+using namespace std;
+ 
+int arr[101];
+ 
+int sol[101];
+ 
+int gcd(int a, int b) {
+    return a % b ? gcd(b, a%b) : b;
+}//최대공배수
+ 
+ 
+int main() {
+    int n, include_m, i, count(0);
+    cin >> n;
+    for (i = 0; i < n; i++)
+        cin >> arr[i];
+    sort(arr, arr + n);//정렬
+ 
+    include_m = arr[1] - arr[0];
+    for (i = 2; i < n; i++)
+        include_m = gcd(include_m, arr[i] - arr[i - 1]);//원소의 차 사이의 최대공약수를 구함. 
+ 
+    for (i = 1; i*i <= include_m; i++)
+        if (include_m%i == 0) { //그 최대공약수가 나눠지는 수가 있다면 그 수를 넣는다.
+            sol[count++] = i;
+            if (i != include_m / i) sol[count++] = include_m / i; //그 수가 제곱수가 아니면 그 다음에는 최대공약수를 나눈 수를 넣는다.
+        }
+ 
+    sort(sol, sol + count);
+    for (int i = 0; i < count; i++) 
+        if (sol[i] != 1)
+            cout << sol[i] << " ";
+    
+}
+
+
+
+
+//순열 원소 출력
+#include <stdio.h>
+
+int nums[9] = {};//인덱스와 같은 숫자의 순열의 원소가 이미 사용됐는지 체크하는 체크리스트
+void solve(int n, int m, int *arr, int l){//n,m,순열집합, 순열집합의 원소의 개수
+    int j = 1;//순열의 원소. 초기값1.
+    if (l == m){
+        for(int i = 0; i < m; i++)
+            printf("%d ", arr[i]);
+        printf("\n");
+    }
+    else{
+        while (j <= n){
+            arr[l] = j;//순열을 채운다.
+            if (nums[j]) { //0이 아니라면 이미 사용됐다는 뜻.
+                j++;
+                continue;//continue해서 루프의 처음으로 돌아가서 다시 채운다.
+            }
+            nums[j]++; //원소가 사용되므로 우선 해당 인덱스를 체크하고,
+            solve(n, m, arr, l + 1); //재귀를 통해 나머지 순열집합을 채운다.
+            nums[j]--;// 많은 재귀가 모두 끝났으면 값을 줄여서 다시 사용할 수 있게 한다.
+            j++;//j값을 늘려서 남은 재귀들을 전부 끝내버림. 의미없이 늘어나는 num값들은 사용되지 않음.
+        }
+    }
+}
+
+int main(){
+    int n, m;
+    scanf_s("%d %d", &n, &m);
+    if (m == 1){
+        int i = 1;
+        while (i <= n)
+            printf("%d\n", i++);
+    }//m이 1이면 1부터 n까지 출력
+
+    else{
+        int arr[3];//순열의 집합
+        solve(n, m, arr, 0);
+    }
+    return 0;
+}
+
+
+/*begin, end, mid를 받고, 
+mid를 기준으로 왼쪽 배열 전부를 따로 저장하고, 남은 배열을 당긴 뒤, 저장한 배열을 그 뒤에 나열.
+*/
+#include <stdio.h>
+
+int main() {
+  int n,m; scanf("%d %d",&n,&m);
+int bsk[n+1]; // [1]부터 저장해서 계산하기 쉽게 +1해둠.
+int tmp[n+1]; //임시저장 배열
+
+for (int i=1;i<=n;i++)
+bsk[i]=i;// bsk[1]은 1번바구니, 여기엔 1이 들어가있음. 
+
+while(m--){
+
+int b,e,mid; scanf("%d %d %d",&b,&e,&mid);
+int loc=b; //배열을 당길 위치
+  
+for (int i=b; i<mid; i++) tmp[i]=bsk[i]; //앞부분 임시저장
+for (int j=mid; j<=e; j++,loc++) bsk[loc]=bsk[j];//배열 당기기
+for(int i=b; loc<=e; loc++,i++) bsk[loc]=tmp[i]; //당기고 남은 위치부터 끝까지 저장해둔 걸 대입.
+}
+for (int i=1; i<=n; i++) printf("%d ",bsk[i]);
+}
+  
+
+
+
+//완전수 구하기
+#include <stdio.h>
+#include <string.h>
+int main() {
+int n;
+int pill[100001];
+
+while(1){
+int a=0,sum=0; //선언 및 초기화
+int pill[100001]={0};
+scanf("%d",&n);
+
+if (n==-1) break;
+
+for (int i=1; i<n; i++) //자기자신은 제외한 약수 구하기
+{
+	if (n%i==0)
+	{
+	pill[a]=i;
+	sum+=pill[a];
+    a++;
+	}
+} //약수 배열 채우기, 모든 약수의 합 구하기
+
+  
+if (sum==n){
+  printf("%d = ",n);
+for (int i=0; pill[i]!=0;i++)
+{
+  printf("%d",pill[i]);
+if (pill[i+1]!=0) printf(" + ");//다음이 있다면 +를 출력.
+}
+  printf("\n");
+}//출력
+    
+else printf("%d is NOT perfect.\n",n);
+  
+}
+return 0;
+}
+
+
+//병합 정렬
+#include <stdio.h>
+
+void merge_sort(int* A, int start, int end, int K);
+void merge(int* A, int p, int q, int r, int K);
+int inputcnt = 0;//몇번째 저장인가?
+
+int main(){
+    int N, K;//배열 크기, 몇번째 저장한 수를 찾는가?
+    scanf("%d %d",&N,&K);
+    int A[N];
+  for(int i=0; i<N; i++)
+        scanf("%d",&A[i]);
+  
+  merge_sort(A,0,N-1,K);
+    if(inputcnt<K) printf("-1");//최대 정렬횟수가 K보다 작으면 -1
+    //for(int i=0; i<N; i++)		//정렬 확인용 코드 
+    //   printf("%d ",A[i]);
+    return 0;
+}
+
+void merge_sort(int* A, int start, int end, int K){
+    int p = start, r = end, mid;
+    if(p<r){
+        mid = (p+r)/2;
+        merge_sort(A,p,mid,K);
+        merge_sort(A,mid+1,r,K);
+        merge(A,p,mid,r,K);
+    }
+}
+
+void merge(int* A, int p, int mid, int r, int K){
+    int tmp[r+2];   //tmp배열에 정렬해놓고 나중에 A배열로 한번에 옮길 것임. 계산 편하게 인덱스 1부터 사용.
+    int i = p, j = mid+1, t = 1;
+    while(i<=mid && j<=r){
+        if(A[i]<=A[j])
+            tmp[t++] = A[i++];
+        else
+            tmp[t++] = A[j++];
+    }
+    while(i<=mid)
+        tmp[t++] = A[i++];
+    while(j<=r)
+        tmp[t++] = A[j++];
+    i = p, t = 1;
+    while(i<=r){//남은 배열 옮겨담고 tmp배열을 A에 복사.
+        A[i++] = tmp[t++];
+        if(++inputcnt==K)   printf("%d",tmp[t-1]);
+    }//복사하면서 옮긴(=저장한) 횟수를 세고, K번째로 저장한 수를 출력.
+  //A[i++] = tmp[t++] 하면서 t값이 하나 늘었으니 출력시엔 tmp[t-1]
+  //혹은 printf("%d",A[i-1])도 가능.
+}
+
+
+
+//하노이의 탑
+현재 원판 번호를 n이라고 하자.
+1. 1번 막대에 있는 1부터 n-1번까지의 원판을 중간 막대로 옮긴다.
+2. 1번 막대에 있는 n번 막대를 3번 막대로 옮긴다.
+3. 중간 막대에 있는 1부터 n-1번까지의 원판을 마지막 막대로 옮긴다.
+
+
+
+그 과정을 출력한다.
+#include <stdio.h>
+int cnt=0,a=0;
+int ary1[1050001], ary2[1050001];
+
+void move(int plate, int from, int to){//판 개수, 시작봉, 목표봉
+  cnt++;//move가 호출되는 횟수를 저장.
+if (plate>1)
+  move (plate-1, from, 6-from-to);//6-from-to는 중간막대
+  
+  ary1[a]=from;
+  ary2[a++]=to;//어디서 어디로 옮겼는지, 옮긴 위치를 저장.
+//printf("%d %d\n",from, to);
+
+  if (plate>1)
+    move (plate-1,6-from-to,to);
+}
+int main(){
+int n;
+scanf("%d",&n);
+move(n,1,3);
+  
+  printf("%d\n",cnt);
+  for (int i=0; i<a; i++)
+  printf("%d %d\n",ary1[i],ary2[i]);
+}
+
+
+
+//실패한 코드
+
+#include <stdio.h>
+#include <string.h>
+int main(){
+ // 옷 종류를 입력한 횟수+ 옷의 각 종류의 개수를 곱한 값을 구하면 됨.
+int t; scanf("%d",&t);
+  int n;//의상 수
+  
+  while(t--){
+    int ans=0;//패션의 가짓수(답)
+  int num[30]={0,}; //옷의 각 종류별 개수
+  int mul=1,tcnt=0;//곱하는 값, 임시 카운터
+  char fcloth[21];//의미 없는 의상 이름 배열
+char type[30][21];//의미 있는 의상 종류 배열
+char tmp[21];//임시저장배열
+    
+scanf("%d",&n);
+scanf("%s %s",fcloth,tmp);
+    strcpy(type[0],tmp);
+    num[0]++;
+for (int i=1; i<n;i++){
+  scanf("%s %s",fcloth,tmp);// 옷 종류 받고
+  tcnt=0;
+  for (int j=0;j<i;j++){
+  int already = strcmp(type[j],tmp);//type배열 검사해서
+    if (already==0) {//strcmp는 둘이 같으면 0 반환
+      num[j]++;
+      tcnt++;
+      break;
+      }// 중복이 있다면.. 해당하는 인덱스의 옷의 개수를 올리고, tcnt를 올려서 중복이 있었다는 것을 표시함.
+    }
+  if (tcnt==0) num[i]++;//중복이 없었으면 해당하는 인덱스의 옷의 개수를 올림.
+  }
+
+    for (int k=0;num[k]!=0;k++)
+      mul*=num[k];
+    
+    ans+=n+mul;  
+  printf("%d\n",ans);  
+  }
+
+
+  
+}
+
+//뭔진 모르겠지만...
+#include <stdio.h>
+int ary[21][21][21];
+
+int w(int a, int b, int c){
+if(a <= 0 || b <= 0 || c <= 0) return 1;//0이하는 그냥 1 반환
+if ((a>20)||(b>20)||(c>20)) a=b=c=20; //20초과는 그냥 20으로 강제로 맞춰버림.
+
+for(int i=0; i<=a; i++){
+    for(int j=0; j<=b; j++){
+      for(int k=0; k<=c; k++){
+        if(i==0 || j==0 || k==0) ary[i][j][k] = 1;
+        else if(i < j && j < k) ary[i][j][k] = ary[i][j][k-1] + ary[i][j-1][k-1]- ary[i][j-1][k];    
+else ary[i][j][k] = ary[i-1][j][k] + ary[i-1][j-1][k]+ ary[i-1][j][k-1] - ary[i-1][j-1][k-1]; 
+}}}//ary배열 채우기.
+return ary[a][b][c];
+}
+
+int main(void) {
+  int a, b, c;
+
+  while(1){
+    scanf("%d %d %d", &a, &b, &c);
+    if(a == -1 && b == -1 && c == -1)
+      break;
+    printf("w(%d, %d, %d) = %d\n", a, b, c, w(a, b, c));
+  }
+}
+
+
+//파도삼각형 유사 피보나치?
+/*첫번째+두번째 = 네번째
+두번째+세번째 = 다섯번째
+*/
+#include <stdio.h>
+long long int p[101] = { 0,1,1,1,2,2,3,4,5,7,9 }; //인덱스 1부터 사용할 것임.
+
+long long int ans(int n) {
+	if (p[n] != 0) return p[n]; //저장돼있으면 그거 반환
+	p[n]=ans(n - 3) + ans(n - 2);//저장
+	return p[n];
+}
+
+int main() {
+	int t, n;
+	scanf("%d", &t);
+	while (t--) {
+		scanf("%d", &n);
+		printf("%lld\n", ans(n));
+	}
+
+}
+
+
